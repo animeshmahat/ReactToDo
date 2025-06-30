@@ -4,11 +4,14 @@ import TodoItems from "./TodoItems";
 import { useEffect, useRef, useState } from "react";
 
 export default function Todo() {
-  const [todoList, setTodoList] = useState(
-    localStorage.getItem("todos")
-      ? JSON.parse(localStorage.getItem("todos"))
-      : ""
-  );
+  const [todoList, setTodoList] = useState(() => {
+    try {
+      const stored = localStorage.getItem("todos");
+      return Array.isArray(JSON.parse(stored)) ? JSON.parse(stored) : [];
+    } catch (err) {
+      return [];
+    }
+  });
 
   const inputRef = useRef();
 
@@ -82,8 +85,8 @@ export default function Todo() {
 
       {/* ToDo List */}
       <div>
-        {todoList.map((item, index) => {
-          return (
+        {Array.isArray(todoList) &&
+          todoList.map((item, index) => (
             <TodoItems
               key={index}
               text={item.text}
@@ -92,8 +95,7 @@ export default function Todo() {
               deleteTodo={deleteTodo}
               toggle={toggle}
             />
-          );
-        })}
+          ))}
       </div>
     </div>
   );
